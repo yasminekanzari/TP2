@@ -19,9 +19,12 @@ def calculer_priorite(commande):
     
     # TODO: Implémenter l'algorithme de priorité
     # Score = (temps_attente × 2) + (nombre_items × 1) + (client_vip × 10)
-    
+    temps_attente = commande.get("temps_attente",0)
+    nombre_items = commande.get("nombre_items",0)
+    client_vip = commande.get("client_vip", False)
+    vip = 1 if client_vip else 0 
+    score = int((temps_attente * 2) + (nombre_items * 1) + (vip * 10))
     return score
-
 
 def trier_commandes(liste_commandes):
     """
@@ -37,6 +40,9 @@ def trier_commandes(liste_commandes):
     # TODO: Implémenter un algorithme de tri (suggestion: tri à bulles)
     # Les commandes avec le score le plus élevé doivent être en premier
     
+
+
+
     return liste_commandes
 
 

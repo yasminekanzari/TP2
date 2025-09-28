@@ -40,7 +40,7 @@ def analyser_menu(menu):
     # TODO: Calculer le temps de préparation moyen
     temps_moyen = temps_total / len(menu)
 
-    stats["plat_le_plus_rentable"] = meilleur_plat
+    stats["plat_plus_rentable"] = meilleur_plat
     stats["prix_moyen"] = prix_moyen
     stats["temps_moyen"] = temps_moyen
 
