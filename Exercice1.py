@@ -36,9 +36,14 @@ def analyser_menu(menu):
             meilleur_plat = plat
 
     # TODO: Calculer le prix moyen du menu
-    prix_moyen = prix_total / len(menu)
     # TODO: Calculer le temps de préparation moyen
-    temps_moyen = temps_total / len(menu)
+    if len(menu) == 0:
+        prix_moyen = 0
+        temps_moyen = 0
+        meilleur_plat = None
+    else:
+        prix_moyen = prix_total / len(menu)
+        temps_moyen = temps_total / len(menu)
 
     stats["plat_plus_rentable"] = meilleur_plat
     stats["prix_moyen"] = prix_moyen
@@ -62,13 +67,17 @@ def filtrer_menu_par_categorie(menu, categories):
     
     # TODO: Organiser les plats par catégorie
     # Exemple: {'entrées': [...], 'plats': [...], 'desserts': [...]}
+    
+    menu_filtre = {"entrées":[], "plats": [], "desserts": []}
+    
     for plat, infos in menu.items(): 
         categorie = categories.get(plat,False)
-        if categorie not in menu_filtre:
+        if categorie in menu_filtre:
+            menu_filtre[categorie].append((plat,infos))
+        else:
             menu_filtre[categorie] = []
-        menu_filtre[categorie].append((plat,infos))
-        menu_filtre = {"entrées":[], "plats": [], "desserts": []}
-        return menu_filtre
+    
+    return menu_filtre
 
 def calculer_profit(menu, ventes_jour):
     """
@@ -88,7 +97,7 @@ def calculer_profit(menu, ventes_jour):
     for plat in ventes_jour:
         if plat in menu:
             prix_plat = menu[plat][0]
-            nombre_ventes = ventes_jour.get("plat",0)
+            nombre_ventes = ventes_jour.get(plat,0)
             profit += (prix_plat * nombre_ventes)
     return profit
 

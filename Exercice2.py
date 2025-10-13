@@ -97,7 +97,7 @@ def identifier_commandes_urgentes(liste_commandes, seuil_attente=30):
     # TODO: Identifier les commandes avec temps_attente > seuil
     for commande in liste_commandes:
         if commande.get("temps_attente",0) > seuil_attente:
-            commandes_urgentes.append(commande)
+            commandes_urgentes.append(commande.get("numero"))
 
     return commandes_urgentes
 
