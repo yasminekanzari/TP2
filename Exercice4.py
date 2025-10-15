@@ -67,10 +67,14 @@ def marquer_reservation(salle, position, taille_groupe):
     
     # TODO: Marquer la table à la position donnée comme réservée (vérifier qu'elle est libre, on pourra utiliser la méthode startswith())
     # 'R2' pour table de 2 réservée, 'R4' pour table de 4
-    for rangée in range(len(salle)):
-        for colonne in range(len(salle[0])):
-             if nouvelle_salle[rangée][colonne][0] == 'L':
-                  nouvelle_salle[rangée][colonne] = 'R' + nouvelle_salle[rangée][colonne][1]
+    
+    rangee, colonne = position
+    table = nouvelle_salle[rangee][colonne]
+
+    if table.startswith("L"):
+        taille_table = int(table[1])
+        if taille_groupe <= taille_table:
+            nouvelle_salle[rangee][colonne] = f"R{taille_table}"
     return nouvelle_salle
 
 
@@ -103,18 +107,15 @@ def calculer_score_table(position, taille_table, taille_groupe, nb_colonnes):
     
     score=100
     
-    place_libre=taille_table-taille_groupe
-    if place_libre >=0:
-        score -= -10*place_libre
-        
+    score -= 10 * (taille_table - taille_groupe)
     
-    for rangée in range(len(salle)):
-        for colonne in range(len(salle[0])):
-            if colonne == 0:
-                score +=20
+    rangée,colonne = position
 
-            if rangée <3:
-                score +=5
+    if colonne == 0 or colonne == nb_colonnes -1:
+        score +=20
+
+    if rangée < 3:
+        score += 5
             
     return score
 
@@ -135,8 +136,11 @@ def trouver_meilleure_table(salle, taille_groupe):
     
     # TODO: Parcourir toutes les tables libres ('L2' ou 'L4')
     # Calculer leur score et garder la meilleure
-    for i, rangee in enumerate(salle):
-        for j, table in enumerate(rangee):
+    
+    nb_colonnes = len(salle[0])
+
+    for i, rangée in enumerate(salle):
+        for j, table in enumerate(rangée):
             if table.startswith('L'):  # Table libre
                 taille_table = int(table[1])
                 score = calculer_score_table((i, j), taille_table, taille_groupe, nb_colonnes)
