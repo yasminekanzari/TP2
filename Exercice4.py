@@ -39,7 +39,15 @@ def initialiser_salle(nb_rangees, nb_colonnes, positions_tables):
     # TODO: Créer une grille remplie de 'X' (espaces non disponibles)
     # Puis placer les tables aux positions indiquées
     # Format: 'L2' pour table libre de 2, 'L4' pour table libre de 4
-    
+    salle = [[ "X" for _ in range(nb_colonnes)] for _ in range(nb_rangees)]
+    for position in positions_tables:
+        rangee = position[0]
+        colonne = position[1]
+        taille = position[2]
+        if taille == 2:
+            salle[rangee][colonne] = "L2"
+        elif taille == 4:
+            salle[rangee][colonne] = "L4"
     return salle
 
 
@@ -59,7 +67,10 @@ def marquer_reservation(salle, position, taille_groupe):
     
     # TODO: Marquer la table à la position donnée comme réservée (vérifier qu'elle est libre, on pourra utiliser la méthode startswith())
     # 'R2' pour table de 2 réservée, 'R4' pour table de 4
-    
+    for rangée in range(len(salle)):
+        for colonne in range(len(salle[0])):
+             if nouvelle_salle[rangée][colonne][0] == 'L':
+                  nouvelle_salle[rangée][colonne] = 'R' + nouvelle_salle[rangée][colonne][1]
     return nouvelle_salle
 
 
@@ -86,7 +97,25 @@ def calculer_score_table(position, taille_table, taille_groupe, nb_colonnes):
     # - Pénalité: -10 points par place vide (gaspillage)
     # - Bonus fenêtre: +20 points si colonne == 0 ou colonne == nb_colonnes-1
     # - Bonus position: +5 points si rangée < 3 (près de l'entrée)
+
+    if taille_table<taille_groupe:
+        return -1
     
+    score=100
+    
+    place_libre=taille_table-taille_groupe
+    if place_libre >=0:
+        score -= -10*place_libre
+        
+    
+    for rangée in range(len(salle)):
+        for colonne in range(len(salle[0])):
+            if colonne == 0:
+                score +=20
+
+            if rangée <3:
+                score +=5
+            
     return score
 
 
@@ -106,7 +135,16 @@ def trouver_meilleure_table(salle, taille_groupe):
     
     # TODO: Parcourir toutes les tables libres ('L2' ou 'L4')
     # Calculer leur score et garder la meilleure
-    
+    for i, rangee in enumerate(salle):
+        for j, table in enumerate(rangee):
+            if table.startswith('L'):  # Table libre
+                taille_table = int(table[1])
+                score = calculer_score_table((i, j), taille_table, taille_groupe, nb_colonnes)
+
+                if score > meilleur_score:
+                    meilleur_score = score
+                    meilleure_table = ((i, j), taille_table)
+
     return meilleure_table
 
 
@@ -132,7 +170,31 @@ def generer_rapport_occupation(salle):
     
     # TODO: Compter les différents types de tables
     # Calculer le taux d'occupation (réservées + occupées) / total
+
+    for rangee in salle:
+        for table in rangee:
+            if table == 'L2':
+                rapport['tables_libres_2'] += 1
+            elif table == 'L4':
+                rapport['tables_libres_4'] += 1
+            elif table == 'R2':
+                rapport['tables_reservees_2'] += 1
+            elif table == 'R4':
+                rapport['tables_reservees_4'] += 1
+            elif table == 'O2':
+                rapport['tables_occupees_2'] += 1
+            elif table == 'O4':
+                rapport['tables_occupees_4'] += 1
     
+    total_tables = (rapport['tables_libres_2'] + rapport['tables_libres_4'] +
+                rapport['tables_reservees_2'] + rapport['tables_reservees_4'] +
+                rapport['tables_occupees_2'] + rapport['tables_occupees_4'])
+
+    tables_occupees_ou_reservees = (rapport['tables_reservees_2'] + rapport['tables_reservees_4'] +
+                                 rapport['tables_occupees_2'] + rapport['tables_occupees_4'])
+
+    if total_tables > 0:
+        rapport['taux_occupation'] = tables_occupees_ou_reservees / total_tables    
     return rapport
 
 
