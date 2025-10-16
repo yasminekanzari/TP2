@@ -142,12 +142,7 @@ Fonctions à compléter (`TODO`) :
   - Produire la liste `mots_trouves`.
   - Borner le score final entre `0` et `10`.
 
-- `categoriser_commentaires(liste_commentaires, mots_cles)`  
-  - Analyser chaque commentaire et le classer :
-    - `'positifs'` : score >= 7
-    - `'neutres'` : 4 ≤ score ≤ 6
-    - `'negatifs'` : score < 4
-  - Stocker tuples `(texte_commentaire, score)` dans chaque catégorie.
+score, mots_trouves = analyser_commentaire(comm, mots_cles)
 
 - `identifier_problemes(commentaires_negatifs, mots_cles_negatifs)`  
   - Compter la fréquence (nombre d'apparitions) de mots-clés négatifs dans les commentaires négatifs.

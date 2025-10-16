@@ -32,7 +32,13 @@ def analyser_commentaire(commentaire, mots_cles):
         # D'abord, vérifier la correspondance exacte dans la liste des mots
         # Sinon, vérifier si le mot-clé est le début d'un mot du commentaire (cela permet de trouver "froid" dans "froide" ou "froids"), pour cela utiliser la méthode startswith().
     # Borner le score final entre 0 et 10
-    
+    for mots_cles, score in mots_cles.items():
+        for mot in mots_commentaire: 
+            if mot == mots_cles or mot.startswith(mots_cles):
+                score_total += score
+                mots_trouves.append(mots_cles)
+
+
     return score_total, mots_trouves
 
 
@@ -53,7 +59,14 @@ def categoriser_commentaires(liste_commentaires, mots_cles):
     # TODO: Analyser chaque commentaire
     # Catégoriser selon le score obtenu
     # Stocker le commentaire et son score dans la bonne catégorie
-    
+    for commentaire in liste_commentaires:
+        score, mots_trouves = analyser_commentaire(commentaire, mots_cles)
+        if score >= 7:
+            categories['positifs'].append((commentaire, score))
+        elif score >= 4: 
+            categories['neutres'].append((commentaire, score))
+        else:
+            categories['negatifs'].append((commentaire, score))
     return categories
 
 
