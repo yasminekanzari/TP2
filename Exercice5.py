@@ -37,6 +37,11 @@ def analyser_commentaire(commentaire, mots_cles):
             if mot == mots_cles or mot.startswith(mots_cles):
                 score_total += score
                 mots_trouves.append(mots_cles)
+    
+    if score_total > 10:
+         score_total = 10
+    if score_total < 0:
+         score_total = 0
 
 
     return score_total, mots_trouves
@@ -67,6 +72,7 @@ def categoriser_commentaires(liste_commentaires, mots_cles):
             categories['neutres'].append((commentaire, score))
         else:
             categories['negatifs'].append((commentaire, score))
+
     return categories
 
 
@@ -86,7 +92,35 @@ def identifier_problemes(commentaires_negatifs, mots_cles_negatifs):
     # TODO: Pour chaque commentaire négatif
     # Compter le nombre d'apparition de chaque mot-clé négatif
     # Retourner un dictionnaire trié par fréquence décroissante
+    for commentaire in commentaires_negatifs:
+        commentaire=commentaire.lower()
+        for char in '.,!?;:()[]{}"\'-':
+            commentaire = commentaire.replace(char, ' ')
+            mots_commentaire = commentaire.split()
+    for mots_cles in mots_cles_negatifs:
+        for mot in mots_commentaire:
+            if mot == mots_cles or mot.startswith(mots_cles):
+                if mots_cles in frequence_problemes:
+                    frequence_problemes[mots_cles] += 1
+            else:
+                    frequence_problemes[mots_cles] = 1
+    liste = []
+    for mot, freq in frequence_problemes.items():
+        liste.append((mot, freq))
     
+    liste_triee = []
+    while liste:
+        max = liste[0]
+        for t in liste:
+            if t[1] > max[1]:
+                max = t
+            liste_triee.append(max)
+            liste.remove(max)
+            liste = liste_triee
+    
+    frequence_triee = {}
+    for mot, freq in liste_triee:
+        frequence_triee[mot] = freq
     return frequence_problemes
 
 
@@ -111,7 +145,27 @@ def generer_rapport_satisfaction(categories, frequence_problemes):
     # TODO: Calculer la satisfaction moyenne
     # Calculer la distribution (% positifs, neutres, négatifs)
     # Identifier les 3 principaux points d'amélioration (les 3 problèmes les plus fréquents)
-    
+    score_total = 0
+    commentaires = 0
+    for cat in categories.values():
+        for texte, score in cat:
+            score_total += score
+            commentaires += 1
+    if commentaires > 0:
+        rapport['satisfaction_moyenne'] = score_total / commentaires
+
+    for nom_catégorie, catégorie in categories.items():
+        if commentaires > 0:
+            pourcentage = (len(catégorie) / commentaires) * 100
+        else:
+            pourcentage = 0
+        rapport['distribution'][nom_catégorie]
+
+    liste= []
+    for mot, freq in frequence_problemes.items():
+        liste.append((mot, freq))
+    liste.sort(key=lambda x: x[1], reverse=True) 
+    rapport['points_amelioration'] = [mot for mot, freq in liste[:3]]
     return rapport
 
 
@@ -131,7 +185,19 @@ def calculer_tendance(historique_scores):
     # Si augmentation constante: 'amélioration'
     # Si diminution constante: 'dégradation'
     # Sinon: 'stable'
-    
+    if len(historique_scores) < 2:
+        return 'stable'
+
+    premier = historique_scores[0]
+    dernier = historique_scores[-1]
+
+    if dernier > premier:
+        return 'amélioration'
+    elif dernier < premier:
+        return 'dégradation'
+    else:
+        return 'stable'
+
     return tendance
 
 
