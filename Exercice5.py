@@ -93,34 +93,21 @@ def identifier_problemes(commentaires_negatifs, mots_cles_negatifs):
     # Compter le nombre d'apparition de chaque mot-clé négatif
     # Retourner un dictionnaire trié par fréquence décroissante
     for commentaire in commentaires_negatifs:
-        commentaire=commentaire.lower()
+        texte = commentaire.lower()
+        # supprimer ponctuation
         for char in '.,!?;:()[]{}"\'-':
-            commentaire = commentaire.replace(char, ' ')
-            mots_commentaire = commentaire.split()
-    for mots_cles in mots_cles_negatifs:
-        for mot in mots_commentaire:
-            if mot == mots_cles or mot.startswith(mots_cles):
-                if mots_cles in frequence_problemes:
-                    frequence_problemes[mots_cles] += 1
-            else:
-                    frequence_problemes[mots_cles] = 1
-    liste = []
-    for mot, freq in frequence_problemes.items():
-        liste.append((mot, freq))
-    
-    liste_triee = []
-    while liste:
-        max = liste[0]
-        for t in liste:
-            if t[1] > max[1]:
-                max = t
-            liste_triee.append(max)
-            liste.remove(max)
-            liste = liste_triee
-    
-    frequence_triee = {}
-    for mot, freq in liste_triee:
-        frequence_triee[mot] = freq
+            texte = texte.replace(char, ' ')
+        mots_commentaire = texte.split()
+
+        for mot_cle in mots_cles_negatifs:
+            for mot in mots_commentaire:
+                if mot == mot_cle or mot.startswith(mot_cle):
+                    frequence_problemes[mot_cle] = frequence_problemes.get(mot_cle, 0) + 1
+
+    # trier par fréquence décroissante
+    liste_triee = sorted(frequence_problemes.items(), key=lambda x: x[1], reverse=True)
+    frequence_problemes = {mot: freq for mot, freq in liste_triee}
+
     return frequence_problemes
 
 
@@ -161,12 +148,8 @@ def generer_rapport_satisfaction(categories, frequence_problemes):
             pourcentage = 0
         rapport['distribution'][nom_catégorie]
 
-    liste= []
-    for mot, freq in frequence_problemes.items():
-        liste.append((mot, freq))
-    liste.sort(key=lambda x: x[1], reverse=True) 
+    liste = sorted(frequence_problemes.items(), key=lambda x: x[1], reverse=True)
     rapport['points_amelioration'] = [mot for mot, freq in liste[:3]]
-    return rapport
 
 
 def calculer_tendance(historique_scores):
